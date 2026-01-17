@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  credits      Int       @default(20)
+  projects     Project[]
+}
+
+model Project {
+  id         String   @id @default(uuid())
+  name       String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  sandboxId  String?  // E2B Session ID
+  createdAt  DateTime @default(now())
+  files      File[]
+}
+
+model File {
+  id        String  @id @default(uuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  path      String  // e.g. "src/App.tsx"
+  content   String  @db.Text
+
+  @@unique([projectId, path])
+}
