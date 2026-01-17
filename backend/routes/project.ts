@@ -1,8 +1,10 @@
 import express from 'express'
 import verifyUser from '../middleware'
 import { prisma } from '../db'
-import { id } from 'zod/locales'
+
 const router = express.Router()
+import 'dotenv/config';
+import { Sandbox } from 'e2b';
 
 router.post('/', verifyUser, async (req, res, next) => {
     const { name } = req.body
@@ -12,13 +14,14 @@ router.post('/', verifyUser, async (req, res, next) => {
         return res.status(401).json({ error: 'User not authenticated' })
     }
 
+    const sandbox = await Sandbox.create("akshith-dev");
+    const id = sandbox.sandboxId
     try {
         const newproject = await prisma.project.create({
             data: {
                 name: name || "Untitled Project",
                 userId: userid,
-                sandboxId: "testing for now"
-
+                sandboxId: id
             }
         })
         res.status(201).json(newproject)
@@ -42,8 +45,8 @@ router.get('/:id', verifyUser, async (req, res, next) => {
                     userId: req.userId,
                     id: projectid
                 },
-                include:{
-                    files:true
+                include: {
+                    files: true
                 }
             })
             return res.status(200).json(check);
