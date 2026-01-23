@@ -8,7 +8,7 @@ const LivePreview = ({ url }: LivePreviewProps) => {
     return (
         <div className='w-full h-full'>
             <iframe
-                src={url || "https://media.geeksforgeeks.org/wp-content/uploads/20240206111438/uni2.html"}
+                src={url}
                 height="100%"
                 width="100%"
                 className="border-0"

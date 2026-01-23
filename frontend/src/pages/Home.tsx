@@ -46,57 +46,69 @@ const Home = () => {
     }, [projectId])
 
     return (
-        <div className="w-full h-screen flex gap-4 p-4 overflow-hidden bg-background">
+        <div className="w-full h-screen flex gap-4 p-4 overflow-hidden bg-zinc-950 text-neutral-200 font-sans">
 
-
-
-            <div className="flex-[1] min-w-[300px] h-full">
+            <div className="flex-[1] min-w-[350px] max-w-[400px] h-full flex flex-col gap-4">
                 <Chat onUrlReceived={handleProjectCreated} />
             </div>
 
-            <div className="flex-[3] h-full flex flex-col bg-card rounded-xl border border-border overflow-hidden shadow-sm">
-                <div className="flex items-center gap-1 p-2 border-b border-border bg-muted/40 backdrop-blur-sm">
-                    <button
-                        onClick={() => setActiveTab('editor')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'editor'
-                            ? 'bg-background text-foreground shadow-sm ring-1 ring-border'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-                            }`}
-                    >
-                        <Code className="w-4 h-4" />
-                        Code Editor
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('preview')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'preview'
-                            ? 'bg-background text-foreground shadow-sm ring-1 ring-border'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-                            }`}
-                    >
-                        <Eye className="w-4 h-4" />
-                        Live Preview
-                    </button>
+            <div className="flex-[3] h-full flex flex-col bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden shadow-2xl relative">
+                {/* Tab Header */}
+                <div className="flex items-center justify-between p-2 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
+                    <div className="flex items-center gap-1 bg-zinc-800/50 p-1 rounded-lg">
+                        <button
+                            onClick={() => setActiveTab('editor')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${activeTab === 'editor'
+                                ? 'bg-zinc-700 text-zinc-100 shadow-sm'
+                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                                }`}
+                        >
+                            <Code className="w-4 h-4" />
+                            Code
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('preview')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${activeTab === 'preview'
+                                ? 'bg-zinc-700 text-zinc-100 shadow-sm'
+                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                                }`}
+                        >
+                            <Eye className="w-4 h-4" />
+                            Preview
+                        </button>
+                    </div>
+                    <div className="px-4 text-xs text-zinc-500 font-mono">
+                        {projectId ? `Project ID: ${projectId}` : 'No Project Selected'}
+                    </div>
                 </div>
 
-                <div className="flex-1 relative overflow-hidden bg-background">
+                <div className="flex-1 relative overflow-hidden bg-zinc-950">
                     {activeTab === 'editor' ? (
                         <div className="h-full w-full flex">
-                            <div className="w-64 h-full border-r border-border overflow-hidden bg-[#1e1e1e]">
+                            {/* File Tree Sidebar */}
+                            <div className="w-64 h-full border-r border-zinc-800 overflow-hidden bg-[#1e1e1e]">
                                 <FileTree
                                     files={files}
                                     onSelect={setSelectedFile}
                                     selectedFile={selectedFile}
                                 />
                             </div>
-                            <div className="flex-1 h-full">
+                            {/* Code Area */}
+                            <div className="flex-1 h-full relative">
+                                {!files.find(f => f.path === selectedFile) && (
+                                    <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-sm">
+                                        Select a file to view content
+                                    </div>
+                                )}
                                 <CodeEditor
                                     code={files.find(f => f.path === selectedFile)?.content || ''}
-                                    language={selectedFile.endsWith('json') ? 'json' : selectedFile.endsWith('css') ? 'css' : 'typescript'}
+                                    language={selectedFile.endsWith('json') ? 'json' : selectedFile.endsWith('css') ? 'css' : selectedFile.endsWith('html') ? 'html' : 'typescript'}
                                 />
                             </div>
                         </div>
                     ) : (
-                        <div className="h-full w-full">
+                        <div className="h-full w-full bg-white">
+                            {/* White bg for preview typically looks better for web apps unless they are dark mode by default */}
                             <LivePreview url={previewUrl} />
                         </div>
                     )}

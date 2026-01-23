@@ -20,6 +20,7 @@ export const coder = async (state: ProjectState) => {
     Your Goal: Convert the 'plan.md' into actual, working code.
     
     STRICT RULES:
+    Strictly do not use any external packages only react and tailwind thats it Or else u are fired
     0. Make sure to configure vite.config.js with server: { allowedHosts: true, host: '0.0.0.0' } to allow external access. IMPORTANT: Since package.json uses 'type': 'module', ALL config files (tailwind.config.js, postcss.config.js) MUST use 'export default' syntax instead of 'module.exports'.
     1. **READ plan.md** to know exactly which files to build.
     2. **OVERWRITE EVERYTHING**: The previous agent only created placeholders. You MUST overwrite them with real code using 'Write_file'.
