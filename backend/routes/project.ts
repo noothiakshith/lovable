@@ -37,7 +37,7 @@ router.post('/create', verifyUser, async (req, res, next) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
     console.log("Creating project for user:", req.userId);
-    await prisma.project.create({
+    const project = await prisma.project.create({
         data: {
             sandboxId: sandboxId,
             name: title,
@@ -71,6 +71,29 @@ router.post('/create', verifyUser, async (req, res, next) => {
     }
     try {
         const result = await app.invoke(initialState, config);
+        const saveFilesToDb = async (dirPath: string) => {
+            const entries = await sbx.files.list(dirPath);
+            for (const entry of entries) {
+                if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+                if (entry.isDirectory || entry.type === 'dir') {
+                    await saveFilesToDb(entry.path);
+                } else {
+                    const content = await sbx.files.read(entry.path);
+                    const relativePath = entry.path.replace('/home/user/app/', '');
+                    await prisma.file.create({
+                        data: {
+                            projectId: project.id,
+                            path: relativePath,
+                            content: content
+                        }
+                    });
+                }
+            }
+        };
+
+        await saveFilesToDb('/home/user/app');
+
+
         if (result.sandbox.previewUrl) {
             console.log(` ${result.sandbox.previewUrl}`);
         }
