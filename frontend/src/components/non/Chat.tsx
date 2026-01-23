@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from '../ui/button'
 import axios from 'axios'
 
@@ -16,7 +16,7 @@ const Chat = ({ onUrlReceived }: ChatProps) => {
         setIsLoading(true)
         try {
             const token = localStorage.getItem('token')
-            const response = await axios.post('http://localhost:5000/project/create', {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/project/create`, {
                 title
             }, {
                 headers: {
@@ -80,8 +80,8 @@ const Chat = ({ onUrlReceived }: ChatProps) => {
                         onClick={handleSend}
                         disabled={isLoading || !title.trim()}
                         className={`rounded-lg px-4 py-2 h-auto text-xs font-semibold transition-all ${isLoading || !title.trim()
-                                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                                : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20'
+                            ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20'
                             }`}
                     >
                         {isLoading ? 'Thinking...' : 'Send'}

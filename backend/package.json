@@ -34,6 +34,7 @@
   },
   "scripts": {
     "e2b:build:dev": "cd akshith && npx tsx build.dev.ts",
-    "e2b:build:prod": "cd akshith && npx tsx build.prod.ts"
+    "e2b:build:prod": "cd akshith && npx tsx build.prod.ts",
+    "postinstall": "prisma generate"
   }
 }

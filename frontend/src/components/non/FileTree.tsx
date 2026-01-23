@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { File, Folder, ChevronRight, ChevronDown } from 'lucide-react'
 
 // Helper to build tree from paths

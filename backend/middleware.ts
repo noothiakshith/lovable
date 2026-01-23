@@ -26,7 +26,7 @@ export default function verifyUser(
   }
 
   try {
-    const decoded = jwt.verify(token, 'secret') as JwtPayload
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as JwtPayload
 
     req.userId = decoded.id
     next()
