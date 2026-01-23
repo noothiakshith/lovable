@@ -1,5 +1,5 @@
 import express from 'express'
-import verifyUser from '../middleware'
+import verifyUser from '../auth-middleware'
 import { prisma } from '../db'
 import { HumanMessage } from "@langchain/core/messages";
 import { app } from '../agent/graph'
