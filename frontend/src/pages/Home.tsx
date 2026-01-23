@@ -33,7 +33,7 @@ const Home = () => {
             const fetchFiles = async () => {
                 try {
                     const token = localStorage.getItem('token')
-                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/project/${projectId}/files`, {
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/project/${projectId}/files`, {
                         headers: { Authorization: `Bearer ${token}` }
                     })
                     setFiles(res.data)

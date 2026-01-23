@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "buildCommand": "cd backend && npm install && npx prisma generate && cd ../frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "echo 'Install handled in buildCommand'",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/backend/api/index.ts"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "functions": {
+    "backend/api/index.ts": {
+      "runtime": "nodejs20.x",
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}
+

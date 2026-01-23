@@ -16,8 +16,8 @@ app.get('/', (req, res) => {
     res.send("Server is running")
 })
 
-app.use('/auth', auth)
-app.use('/project', project)
+app.use('/api/auth', auth)
+app.use('/api/project', project)
 
 if (!process.env.VERCEL) {
     app.listen(5000, () => {

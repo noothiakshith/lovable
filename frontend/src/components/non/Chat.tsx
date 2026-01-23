@@ -16,7 +16,8 @@ const Chat = ({ onUrlReceived }: ChatProps) => {
         setIsLoading(true)
         try {
             const token = localStorage.getItem('token')
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/project/create`, {
+            const apiUrl = import.meta.env.VITE_API_URL || '';
+            const response = await axios.post(`${apiUrl}/api/project/create`, {
                 title
             }, {
                 headers: {
