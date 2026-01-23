@@ -82,6 +82,7 @@ router.post('/create', verifyUser, async (req, res, next) => {
                     const relativePath = entry.path.replace('/home/user/app/', '');
                     await prisma.file.create({
                         data: {
+                            
                             projectId: project.id,
                             path: relativePath,
                             content: content
