@@ -1,4 +1,4 @@
-# akshith - E2B Sandbox Template
+# sathwik - E2B Sandbox Template
 
 This is an E2B sandbox template that allows you to run code in a controlled environment.
 
@@ -40,7 +40,7 @@ Once your template is built, you can use it in your E2B sandbox:
 import { Sandbox } from 'e2b'
 
 // Create a new sandbox instance
-const sandbox = await Sandbox.create('akshith')
+const sandbox = await Sandbox.create('sathwik')
 
 // Your sandbox is ready to use!
 console.log('Sandbox created successfully')
