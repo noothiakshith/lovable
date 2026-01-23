@@ -82,7 +82,7 @@ router.post('/create', verifyUser, async (req, res, next) => {
                     const relativePath = entry.path.replace('/home/user/app/', '');
                     await prisma.file.create({
                         data: {
-                            
+
                             projectId: project.id,
                             path: relativePath,
                             content: content
@@ -107,7 +107,29 @@ router.post('/create', verifyUser, async (req, res, next) => {
     catch (e) {
         console.log(e)
     }
-    return res.status(200).json(`https://5173-${sandboxId}.e2b.app`)
+    return res.status(200).json({
+        url: `https://5173-${sandboxId}.e2b.app`,
+        projectId: project.id
+    })
+})
+
+router.get('/:projectId/files', verifyUser, async (req, res) => {
+    const { projectId } = req.params as { projectId: string };
+    try {
+        const files = await prisma.file.findMany({
+            where: {
+                projectId: projectId
+            },
+            select: {
+                path: true,
+                content: true
+            }
+        });
+        return res.status(200).json(files);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ message: "Error fetching files" });
+    }
 })
 
 export default router
