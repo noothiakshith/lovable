@@ -52,7 +52,7 @@ router.post('/create', verifyUser, async (req, res, next) => {
         },
         recursionLimit: 250
     }
-    const initialState = {
+    const initialState: any = {
         messages: [new HumanMessage(title)],
         sandbox: {
             id: sandboxId,
@@ -75,7 +75,9 @@ router.post('/create', verifyUser, async (req, res, next) => {
             const entries = await sbx.files.list(dirPath);
             for (const entry of entries) {
                 if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-                if (entry.isDirectory || entry.type === 'dir') {
+                // @ts-ignore
+                const isDir = entry.isDirectory || entry.type === 'dir'
+                if (isDir) {
                     await saveFilesToDb(entry.path);
                 } else {
                     const content = await sbx.files.read(entry.path);
