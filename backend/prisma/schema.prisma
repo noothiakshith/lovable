@@ -28,7 +28,7 @@ model Project {
   name       String
   userId     String
   user       User     @relation(fields: [userId], references: [id])
-  sandboxId  String?  // E2B Session ID
+  sandboxId  String?  
   createdAt  DateTime @default(now())
   files      File[]
 }
