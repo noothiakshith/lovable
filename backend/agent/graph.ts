@@ -1,5 +1,5 @@
 import { START, StateGraph, END } from "@langchain/langgraph";
-import { StateAnnotation, ProjectState } from "./state"; // Ensure ProjectState is imported
+import { StateAnnotation, type ProjectState } from "./state"; // Ensure ProjectState is imported
 import { architect } from "./architect";
 import { toolNode } from "./toolnode";
 import { fileNode } from "./file";
@@ -20,8 +20,8 @@ const deployNode = async (state: ProjectState, config: any) => {
         const url = `https://${host}`;
 
         console.log(`\n✅ APP DEPLOYED: ${url}\n`);
-        
-        return { 
+
+        return {
             messages: [new AIMessage(`Server started at: ${url}`)],
             currentPhase: "end",
             sandbox: { ...state.sandbox, isDevServerRunning: true, previewUrl: url }
@@ -56,8 +56,8 @@ const agent = new StateGraph(StateAnnotation)
     .addConditionalEdges("coder", (state) => {
         const lastMsg = state.messages[state.messages.length - 1];
         if ((lastMsg as AIMessage)?.tool_calls?.length) return "tools";
-        
-        return "deployer"; 
+
+        return "deployer";
     })
 
     .addEdge("deployer", END)
