@@ -1,0 +1,88 @@
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00de, 0 0 20px #ff00de;
+    }
+    50% {
+        box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #ff00de, 0 0 40px #ff00de;
+    }
+    100% {
+        box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00de, 0 0 20px #ff00de;
+    }
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 0.97;
+    }
+    5% {
+        opacity: 0.9;
+    }
+    10% {
+        opacity: 1;
+    }
+    15% {
+        opacity: 0.95;
+    }
+    20% {
+        opacity: 0.9;
+    }
+    25% {
+        opacity: 1;
+    }
+    30% {
+        opacity: 0.98;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.retro-glow {
+    animation: glow 2s infinite alternate;
+}
+
+.retro-flicker {
+    animation: flicker 1.5s infinite;
+}
+
+.retro-gradient {
+    background: linear-gradient(90deg, #ff00de, #00ffff, #ff00de);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient 3s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.retro-btn {
+    background: #ff00de;
+    color: #000;
+    border: 2px solid #fff;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.retro-btn:hover {
+    background: #fff;
+    color: #ff00de;
+    box-shadow: 0 0 10px #fff, 0 0 20px #ff00de;
+}
+
+.retro-grid {
+    background-image: linear-gradient(rgba(255, 0, 222, 0.1) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 0, 222, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
