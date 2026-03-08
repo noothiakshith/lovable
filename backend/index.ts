@@ -20,8 +20,8 @@ app.use('/api/auth', auth)
 app.use('/api/project', project)
 
 if (!process.env.VERCEL) {
-    app.listen(5000, () => {
-        console.log("The server is running on port 5000")
+    app.listen(5001, () => {
+        console.log("The server is running on port 5001")
     })
 }
 

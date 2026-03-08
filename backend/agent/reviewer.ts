@@ -3,9 +3,12 @@ import { ProjectState } from "./state";
 import { ChatMistralAI } from "@langchain/mistralai";
 import { tools } from "./toolnode";
 import { Sandbox } from '@e2b/code-interpreter';
+import { sanitizeMessages } from "./utils";
 
 const llm = new ChatMistralAI({
-    model: "mistral-large-latest",
+    model: "codestral-latest",
+    apiKey: process.env.CODESTRAL_API_KEY,
+    serverURL: "https://codestral.mistral.ai",
     temperature: 0,
 }).bindTools(tools);
 
@@ -27,8 +30,6 @@ export const reviewerNode = async (state: ProjectState, config: any) => {
     - Do not loop. run the check once.
     `;
 
-
-
     const triggerMessage = new HumanMessage("Run the build / QA check now.");
 
     try {
@@ -38,10 +39,9 @@ export const reviewerNode = async (state: ProjectState, config: any) => {
         ]);
 
         console.log("🤖 Reviewer Thought:", response.content);
-        
 
         const content = response.content as string;
-        
+
         if (content.toUpperCase().includes("BUILD SUCCESSFUL")) {
             console.log("✅ Build Passed. Initializing Deployment...");
 
@@ -59,7 +59,7 @@ export const reviewerNode = async (state: ProjectState, config: any) => {
 
                 return {
                     messages: [response, new AIMessage(`Server started at: ${url}`)],
-                    currentPhase: "end", 
+                    currentPhase: "end",
                     sandbox: {
                         ...state.sandbox,
                         isDevServerRunning: true,
@@ -82,7 +82,6 @@ export const reviewerNode = async (state: ProjectState, config: any) => {
 
     } catch (error) {
         console.error("❌ Reviewer LLM Error:", error);
-        // Fallback: If LLM fails, send a generic message to keep the graph moving or stop
         return {
             messages: [new AIMessage("Error in Reviewer Node. Retrying...")],
             currentPhase: "review"

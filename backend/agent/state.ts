@@ -3,7 +3,7 @@ import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
 
 export interface SandboxState {
   id: string;
-  rootDir: "/home/user/app"; 
+  rootDir: "/home/user/app";
   previewUrl: string;
   isDevServerRunning: boolean;
 }
@@ -43,6 +43,7 @@ export const StateAnnotation = Annotation.Root({
       { path: "tailwind.config.js", type: "file" },
       { path: "src/App.jsx", type: "file" },
       { path: "src/main.jsx", type: "file" },
+      { path: "src/index.css", type: "file" },
     ],
   }),
 
@@ -51,13 +52,13 @@ export const StateAnnotation = Annotation.Root({
     reducer: (prev, next) => [...prev, ...next],
     default: () => [],
   }),
-  
+
   iterationCount: Annotation<number>({
     reducer: (prev, next) => prev + next,
     default: () => 0,
   }),
 
-  currentPhase: Annotation<"planning" | "coding" | "linting" | "end"|"structure"|"review">({
+  currentPhase: Annotation<"planning" | "coding" | "linting" | "end" | "structure" | "review">({
     reducer: (prev, next) => next,
     default: () => "planning",
   }),

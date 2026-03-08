@@ -21,7 +21,21 @@ export default defineConfig({
     allowedHosts: true
   }
 })
-`
+`;
+
+const tailwindConfig = `
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+`;
 
 const projecschema = z.object({
     title: z.string()
@@ -45,6 +59,7 @@ router.post('/create', verifyUser, async (req, res, next) => {
         }
     })
     await sbx.files.write('/home/user/app/vite.config.js', vitetest);
+    await sbx.files.write('/home/user/app/tailwind.config.js', tailwindConfig);
     const config = {
         configurable: {
             sandboxId: sandboxId,
@@ -80,16 +95,34 @@ router.post('/create', verifyUser, async (req, res, next) => {
                 if (isDir) {
                     await saveFilesToDb(entry.path);
                 } else {
-                    const content = await sbx.files.read(entry.path);
-                    const relativePath = entry.path.replace('/home/user/app/', '');
-                    await prisma.file.create({
-                        data: {
+                    const binaryExtensions = ['.ico', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ttf', '.eot', '.webm', '.mp4'];
+                    if (binaryExtensions.some(ext => entry.name.toLowerCase().endsWith(ext))) {
+                        continue;
+                    }
 
-                            projectId: project.id,
-                            path: relativePath,
-                            content: content
+                    try {
+                        let content = await sbx.files.read(entry.path);
+                        let safeContent = "";
+
+                        if (typeof content === 'string') {
+                            safeContent = content.replace(/\0/g, '');
+                        } else if (Buffer.isBuffer(content) || (content as any) instanceof Uint8Array) {
+                            safeContent = Buffer.from(content as any).toString('utf8').replace(/\0/g, '');
+                        } else {
+                            safeContent = String(content).replace(/\0/g, '');
                         }
-                    });
+
+                        const relativePath = entry.path.replace('/home/user/app/', '');
+                        await prisma.file.create({
+                            data: {
+                                projectId: project.id,
+                                path: relativePath,
+                                content: safeContent
+                            }
+                        });
+                    } catch (readErr) {
+                        console.error(`Skipping unreadable file: ${entry.path}`, readErr);
+                    }
                 }
             }
         };

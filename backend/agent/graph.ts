@@ -1,5 +1,5 @@
 import { START, StateGraph, END } from "@langchain/langgraph";
-import { StateAnnotation, type ProjectState } from "./state"; // Ensure ProjectState is imported
+import { StateAnnotation, type ProjectState } from "./state";
 import { architect } from "./architect";
 import { toolNode } from "./toolnode";
 import { fileNode } from "./file";
@@ -9,7 +9,7 @@ import { Sandbox } from '@e2b/code-interpreter';
 
 
 const deployNode = async (state: ProjectState, config: any) => {
-    console.log(" Starting Development Server...");
+    console.log("🚀 Starting Development Server...");
     try {
         const sandboxId = config.configurable.sandboxId;
         const sbx = await Sandbox.connect(sandboxId);
@@ -33,39 +33,30 @@ const deployNode = async (state: ProjectState, config: any) => {
 };
 
 const agent = new StateGraph(StateAnnotation)
-    .addNode("architect", architect)
-    .addNode("file", fileNode)
-    .addNode("coder", coder)
-    .addNode("deployer", deployNode)
-    .addNode("tools", toolNode)
+    .addNode("architect", architect)   // plans → writes plan.md via tools
+    .addNode("tools", toolNode)        // only used by architect now
+    .addNode("file", fileNode)         // self-contained: creates dirs + placeholder files
+    .addNode("coder", coder)           // self-contained: writes all real code
+    .addNode("deployer", deployNode)   // starts dev server
 
     .addEdge(START, "architect")
 
+    // Architect loops through tools to write plan.md
     .addConditionalEdges("architect", (state) => {
         const lastMsg = state.messages[state.messages.length - 1];
         if ((lastMsg as AIMessage)?.tool_calls?.length) return "tools";
         return "file";
     })
 
-    .addConditionalEdges("file", (state) => {
-        const lastMsg = state.messages[state.messages.length - 1];
-        if ((lastMsg as AIMessage)?.tool_calls?.length) return "tools";
-        return "coder";
-    })
+    // Tools only routes back to architect (planning phase)
+    .addEdge("tools", "architect")
 
-    .addConditionalEdges("coder", (state) => {
-        const lastMsg = state.messages[state.messages.length - 1];
-        if ((lastMsg as AIMessage)?.tool_calls?.length) return "tools";
+    // File node is self-contained — always proceeds to coder
+    .addEdge("file", "coder")
 
-        return "deployer";
-    })
+    // Coder is self-contained — always proceeds to deployer
+    .addEdge("coder", "deployer")
 
-    .addEdge("deployer", END)
-
-    .addConditionalEdges("tools", (state) => {
-        if (state.currentPhase === "planning") return "architect";
-        if (state.currentPhase === "structure") return "file";
-        return "coder";
-    });
+    .addEdge("deployer", END);
 
 export const app = agent.compile();

@@ -1,22 +1,22 @@
-
 import { ChatMistralAI } from "@langchain/mistralai"
 import { ProjectState } from "./state"
 import { HumanMessage, SystemMessage, AIMessage } from "@langchain/core/messages";
 import { tools } from "./toolnode";
+import { sanitizeMessages } from "./utils";
 
 const llm = new ChatMistralAI({
-  model: "mistral-large-latest",
+  model: "codestral-latest",
+  apiKey: process.env.CODESTRAL_API_KEY,
+  serverURL: "https://codestral.mistral.ai",
   temperature: 0,
   maxRetries: 2,
 }).bindTools(tools)
 
 export const architect = async (state: ProjectState) => {
   console.log("Architect START");
-  console.log("Architect Messages:", JSON.stringify(state.messages, null, 2));
-
 
   const systemPrompt = `
-    You are a React Architect. Your goal is to plan a clean, production-ready frontend.
+    You are a React Architect & Premium UI Designer. Your goal is to plan a clean, production-ready frontend using React Single Page App (Vite) and HEAVY Tailwind CSS.
     The project MUST stay inside: /home/user/app
     
     Current Directory Structure:
@@ -24,16 +24,21 @@ export const architect = async (state: ProjectState) => {
     The User Request is :
     ${JSON.stringify(state.messages[0])}
     Task:
-    1. Create a step-by-step plan to build the requested UI.
-    2. Organize files neatly (e.g., src/components, src/hooks).
-    3. ALWAYS use absolute paths starting with /home/user/app.
-    4. you should not give any code instead tell what that file needs to perform
-    In this use the write tool and create a file named plan.md and write the plan in it.
+    1. Create a step-by-step plan to build the requested UI using React.
+    2. Organize files inside src/components, src/hooks, etc.
+    3. You must use Vite, React, and index.html standard entrypoint.
+    4. NO EXTERNAL LIBRARIES: Do NOT use or plan for any external packages (e.g., no lucide-react, no framer-motion, no radix-ui, no shadcn). Use only standard HTML elements and Tailwind CSS. For icons, use emojis or simple SVG paths.
+    5. ALWAYS use absolute paths starting with /home/user/app.
+    5. You should not give any actual code, instead tell what that file needs to perform.
+    In your response, use the Write_file tool to create a file named "plan.md" and write the plan in it.
   `;
+
   try {
+    const safeMessages = sanitizeMessages(state.messages, 10);
+
     const messages = [
       new SystemMessage(systemPrompt),
-      ...state.messages.map((m: any) => {
+      ...safeMessages.map((m: any) => {
         if (m.tool_calls?.length > 0 && !m.content) {
           return new AIMessage({
             content: "Processing tool execution...",
@@ -46,6 +51,7 @@ export const architect = async (state: ProjectState) => {
         return m;
       })
     ];
+
     const response = await llm.invoke(messages)
     return {
       messages: [response],
