@@ -18,7 +18,7 @@ export const fileNode = async (state: ProjectState) => {
     GOAL: Create the directory structure and EMPTY placeholder files based on 'plan.md'.
     
     ROOT DIRECTORY: /home/user/app
-
+    
     RULES:
     1. Read 'plan.md' to understand the folder structure.
     2. Use 'Make_dir' to create all necessary folders (src/components, src/hooks, etc.).
