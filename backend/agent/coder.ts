@@ -36,7 +36,7 @@ export const coder = async (state: ProjectState) => {
   `;
 
   const triggerMessage = new HumanMessage(
-    "The file structure currently contains only placeholders. " + 
+    "The file structure currently contains only placeholders. " +
     "Please OVERWRITE 'src/App.jsx', 'src/main.jsx', 'src/index.css' and all components with the complete code now."
   );
 
