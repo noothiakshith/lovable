@@ -1,16 +1,20 @@
 import { SystemMessage, HumanMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
 import { ProjectState } from "./state";
-import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatOpenAI } from "@langchain/openai";
 import { tools, toolNode } from "./toolnode";
 import { sanitizeMessages } from "./utils";
 
-const llm = new ChatMistralAI({
-    model: "codestral-latest",
-    apiKey: process.env.CODESTRAL_API_KEY,
-    serverURL: "https://codestral.mistral.ai",
+const llm = new ChatOpenAI({
+    model: "mistralai/mistral-large-3-675b-instruct-2512",
+    apiKey: process.env.NVIDIA_API_KEY,
+    configuration: {
+        baseURL: "https://integrate.api.nvidia.com/v1",
+    },
     temperature: 0,
     maxRetries: 2,
-}).bindTools(tools);
+}).bindTools(tools, {
+    parallel_tool_calls: false,
+});
 
 const SYSTEM_PROMPT = `
 You are a Structural Engineer agent.

@@ -1,15 +1,19 @@
 import { SystemMessage, HumanMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
 import { ProjectState } from "./state";
 import { tools, toolNode } from "./toolnode";
-import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatOpenAI } from "@langchain/openai";
 
-const llm = new ChatMistralAI({
-  model: "codestral-latest",
-  apiKey: process.env.CODESTRAL_API_KEY,
-  serverURL: "https://codestral.mistral.ai",
+const llm = new ChatOpenAI({
+  model: "mistralai/mistral-large-3-675b-instruct-2512",
+  apiKey: process.env.NVIDIA_API_KEY,
+  configuration: {
+    baseURL: "https://integrate.api.nvidia.com/v1",
+  },
   temperature: 0,
   maxRetries: 2,
-}).bindTools(tools);
+}).bindTools(tools, {
+  parallel_tool_calls: true,
+});
 
 const SYSTEM_PROMPT = `
 You are a Senior React Developer. Your ONLY job is to write complete, working code into files.
@@ -17,8 +21,12 @@ You are a Senior React Developer. Your ONLY job is to write complete, working co
 ROOT DIRECTORY: /home/user/app
 
 STRICT RULES:
+CRITICAL: NEVER use 'react-router-dom'. NO ROUTING LIBRARIES.
+CRITICAL: Use React state (e.g. useState('home')) and conditional rendering in App.jsx to handle "navigation" between views (e.g. Feed vs Profile).
+
 1. First READ /home/user/app/plan.md to understand what files to build.
-2. Use ONLY React (Vite) + Tailwind CSS. STRICTLY NO external packages, no lucide-react, no framer-motion, no radix-ui, no shadcn, no external icons. If you need icons, use emojis or hand-written SVG paths. No 'npm install' or 'bun add' allowed.
+2. Use ONLY React (Vite) + Tailwind CSS. STRICTLY NO external packages, NO react-router-dom, no lucide-react, no framer-motion, no radix-ui, no shadcn, no external icons. If you need icons, use emojis or hand-written SVG paths. No 'npm install' or 'bun add' allowed.
+3. SYNTAX & INTEGRATION: Every file MUST be syntactically correct and integrate perfectly with others. NO missing imports, NO undefined variables, NO broken component references.
 4. DESIGN AESTHETICS: You MUST build a visually stunning, premium UI with HEAVY Tailwind CSS.
    - Use EXTENSIVE Tailwind utility classes on almost every element.
    - Use vibrant, harmonious color palettes (e.g., bg-slate-900, text-emerald-400, ring-purple-500).
@@ -27,15 +35,22 @@ STRICT RULES:
    - Use clean, modern typography (tracking-wide, leading-relaxed) and generous padding (p-6, max-w-4xl). Do NOT build basic/ugly wireframes. MAKE IT LOOK EXPENSIVE.
 5. ALL config files MUST use 'export default' syntax.
 6. OVERWRITE every placeholder file with full, real, working code using Write_file.
+7. DO NOT OVERWRITE: package.json, vite.config.js, index.html, or tailwind.config.js - these are already configured correctly.
 30. MANDATORY files to overwrite:
-   - src/App.jsx    (main app component)
-   - src/main.jsx   (must import './index.css' and render App)
+   - src/App.jsx    (main app component - MUST import React and export default)
+   - src/main.jsx   (must import './index.css' and render App - MUST import React, ReactDOM, and App)
    - src/index.css  (must have @tailwind base/components/utilities)
    - Every component, hook, AND style file (.css, .module.css) listed in plan.md
 32. DO NOT SKIP STYLE FILES. If plan.md lists CSS modules or style files, you MUST write them.
 33. NEVER respond with "CODING COMPLETE" until you have manually checked off EVERY single file listed in plan.md and verified you have written it.
 34. NEVER use empty strings for img src attributes (e.g., <img src="" />). If an image is needed, use a placeholder URL or a colored div.
 35. If there are still empty placeholder files, you MUST write them.
+36. DEPLOYMENT REQUIREMENT: The application MUST be deployable and run without errors. Ensure:
+    - All imports are correct and files exist
+    - No syntax errors in any file
+    - src/main.jsx properly imports and renders the App
+    - All components are properly exported and imported
+    - The dev server will start successfully on port 5173
 `;
 
 export const coder = async (state: ProjectState, config: any) => {

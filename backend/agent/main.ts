@@ -6,9 +6,11 @@ import { Sandbox } from '@e2b/code-interpreter';
 async function main() {
     console.log("Starting the Agent...");
 
-    const sbx = await Sandbox.create('sathwik-dev');
+    const sbx = await Sandbox.create('sathwik-dev', {
+        timeoutMs: 20 * 60 * 1000 // 20 minutes in milliseconds
+    });
     const sandboxId = sbx.sandboxId;
-    console.log(` Sandbox Created: ${sandboxId}`);
+    console.log(` Sandbox Created: ${sandboxId} (timeout: 20 minutes)`);
     await sbx.files.write('/home/user/app/vite.config.js', `
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -17,7 +19,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    allowedHosts: true
+    port: 5173,
+    strictPort: false,
+    hmr: {
+      clientPort: 5173
+    }
   }
 })
 `)
