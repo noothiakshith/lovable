@@ -58,9 +58,9 @@ export const StateAnnotation = Annotation.Root({
     default: () => 0,
   }),
 
-  currentPhase: Annotation<"planning" | "coding" | "linting" | "end" | "structure" | "review">({
+  currentPhase: Annotation<"requirements" | "planning" | "structure" | "coding" | "testing" | "review" | "deployment" | "end">({
     reducer: (prev, next) => next,
-    default: () => "planning",
+    default: () => "requirements",
   }),
 });
 

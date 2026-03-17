@@ -31,17 +31,18 @@ export const architect = async (state: ProjectState) => {
     
     Current Directory Structure:
     ${JSON.stringify(state.fileSystem)}
-    The User Request is :
-    ${JSON.stringify(state.messages[0])}
+    
     Task:
-    1. Create a step-by-step plan to build the requested UI using React.
-    2. Organize files inside src/components, src/hooks, etc.
-    3. You must use Vite, React, and index.html standard entrypoint.
-    4. NO EXTERNAL LIBRARIES: Do NOT use or plan for any external packages (e.g., NO react-router-dom, no lucide-react, no framer-motion, no radix-ui, no shadcn). Use only standard HTML elements and Tailwind CSS. For icons, use emojis or simple SVG paths. Everything MUST be in a single SPA without router libraries.
-    5. INTEGRATION & SYNTAX: Ensure the architecture allows for seamless component integration with NO syntax errors or missing imports.
-    6. ALWAYS use absolute paths starting with /home/user/app.
-    7. You should not give any actual code, instead tell what that file needs to perform.
-    In your response, use the Write_file tool to create a file named "plan.md" and write the plan in it.
+    1. READ /home/user/app/requirements.md to understand the project requirements
+    2. Create a detailed technical plan based on the requirements
+    3. Organize files inside src/components, src/hooks, etc.
+    4. You must use Vite, React, and index.html standard entrypoint.
+    5. NO EXTERNAL LIBRARIES: Do NOT use or plan for any external packages (e.g., NO react-router-dom, no lucide-react, no framer-motion, no radix-ui, no shadcn). Use only standard HTML elements and Tailwind CSS. For icons, use emojis or simple SVG paths. Everything MUST be in a single SPA without router libraries.
+    6. INTEGRATION & SYNTAX: Ensure the architecture allows for seamless component integration with NO syntax errors or missing imports.
+    7. ALWAYS use absolute paths starting with /home/user/app.
+    8. You should not give any actual code, instead tell what that file needs to perform.
+    
+    In your response, use the Write_file tool to create a file named "plan.md" with the technical architecture plan.
   `;
 
   try {
@@ -62,6 +63,12 @@ export const architect = async (state: ProjectState) => {
         return m;
       })
     ];
+
+    // Ensure the last message is a human message to avoid API errors
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg._getType() === "ai") {
+      messages.push(new HumanMessage("Read the requirements.md file and create a detailed technical architecture plan in plan.md."));
+    }
 
     const response = await llm.invoke(messages)
     return {

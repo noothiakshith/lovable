@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
+import { prisma } from './db.ts'
 
 declare global {
   namespace Express {
@@ -8,7 +9,7 @@ declare global {
     }
   }
 }
-export default function verifyUser(
+export default async function verifyUser(
   req: Request,
   res: Response,
   next: NextFunction
@@ -27,6 +28,15 @@ export default function verifyUser(
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as JwtPayload
+    
+    // Check if user exists in database
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id }
+    })
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found in database' })
+    }
 
     req.userId = decoded.id
     next()

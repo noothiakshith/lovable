@@ -1,9 +1,11 @@
 import { START, StateGraph, END } from "@langchain/langgraph";
 import { StateAnnotation, type ProjectState } from "./state";
+import { requirementsNode } from "./requirements";
 import { architect } from "./architect";
 import { toolNode } from "./toolnode";
 import { fileNode } from "./file";
 import { coder } from "./coder";
+import { testerNode } from "./tester";
 import { AIMessage } from "@langchain/core/messages";
 import { Sandbox } from '@e2b/code-interpreter';
 
@@ -95,29 +97,35 @@ const deployNode = async (state: ProjectState, config: any) => {
 };
 
 const agent = new StateGraph(StateAnnotation)
-    .addNode("architect", architect)   // plans → writes plan.md via tools
-    .addNode("tools", toolNode)        // only used by architect now
-    .addNode("file", fileNode)         // self-contained: creates dirs + placeholder files
-    .addNode("coder", coder)           // self-contained: writes all real code
-    .addNode("deployer", deployNode)   // starts dev server
+    .addNode("requirements", requirementsNode)  // SDLC Phase 1: Requirements Gathering (one-shot)
+    .addNode("architect", architect)            // SDLC Phase 2: Design/Architecture
+    .addNode("archTools", toolNode)             // Tools for architect node
+    .addNode("file", fileNode)                  // SDLC Phase 3: Implementation - Structure
+    .addNode("coder", coder)                    // SDLC Phase 4: Implementation - Coding
+    .addNode("tester", testerNode)              // SDLC Phase 5: Testing
+    .addNode("deployer", deployNode)            // SDLC Phase 6: Deployment
 
-    .addEdge(START, "architect")
+    .addEdge(START, "requirements")
 
-    // Architect loops through tools to write plan.md
+    // Requirements phase - one-shot, goes directly to architect
+    .addEdge("requirements", "architect")
+
+    // Architect phase - loops through tools to write plan.md
     .addConditionalEdges("architect", (state) => {
         const lastMsg = state.messages[state.messages.length - 1];
-        if ((lastMsg as AIMessage)?.tool_calls?.length) return "tools";
+        if ((lastMsg as AIMessage)?.tool_calls?.length) return "archTools";
         return "file";
     })
+    .addEdge("archTools", "architect")
 
-    // Tools only routes back to architect (planning phase)
-    .addEdge("tools", "architect")
-
-    // File node is self-contained — always proceeds to coder
+    // File structure creation → Coding
     .addEdge("file", "coder")
 
-    // Coder is self-contained — always proceeds to deployer
-    .addEdge("coder", "deployer")
+    // Coding → Testing
+    .addEdge("coder", "tester")
+
+    // Testing → Deployment
+    .addEdge("tester", "deployer")
 
     .addEdge("deployer", END);
 
