@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import auth from './routes/auth'
 import project from './routes/project'
 
 console.log("Starting server V2...")
@@ -16,7 +15,6 @@ app.get('/', (req, res) => {
     res.send("Server is running")
 })
 
-app.use('/api/auth', auth)
 app.use('/api/project', project)
 
 if (!process.env.VERCEL) {

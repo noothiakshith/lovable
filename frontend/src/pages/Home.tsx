@@ -32,10 +32,7 @@ const Home = () => {
         if (projectId) {
             const fetchFiles = async () => {
                 try {
-                    const token = localStorage.getItem('token')
-                    const res = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/project/${projectId}/files`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    })
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/project/${projectId}/files`)
                     setFiles(res.data)
                 } catch (e) {
                     console.error("Failed to fetch files", e)

@@ -1,5 +1,4 @@
 import express from 'express'
-import verifyUser from '../auth-middleware'
 import { prisma } from '../db'
 import { HumanMessage } from "@langchain/core/messages";
 import { app } from '../agent/graph'
@@ -41,21 +40,20 @@ const projecschema = z.object({
     title: z.string()
 })
 
-router.post('/create', verifyUser, async (req, res, next) => {
+router.post('/create', async (req, res, next) => {
     const { title } = projecschema.parse(req.body);
     const sbx = await Sandbox.create('sathwik-dev');
     const sandboxId = sbx.sandboxId
     console.log(`Sandbox is created with id ${sandboxId}`);
-    if (!req.userId) {
-        console.log("User not found");
-        return res.status(401).json({ message: "Unauthorized" });
-    }
-    console.log("Creating project for user:", req.userId);
+    
+    // Using a default user ID for now (no auth)
+    const defaultUserId = "d124a9e0-b23b-4819-89b1-289453f41371";
+    console.log("Creating project for user:", defaultUserId);
     const project = await prisma.project.create({
         data: {
             sandboxId: sandboxId,
             name: title,
-            userId: req.userId
+            userId: defaultUserId
         }
     })
     await sbx.files.write('/home/user/app/vite.config.js', vitetest);
@@ -148,7 +146,7 @@ router.post('/create', verifyUser, async (req, res, next) => {
     })
 })
 
-router.get('/:projectId/files', verifyUser, async (req, res) => {
+router.get('/:projectId/files', async (req, res) => {
     const { projectId } = req.params as { projectId: string };
     try {
         const files = await prisma.file.findMany({

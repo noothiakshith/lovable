@@ -1,20 +1,15 @@
 import { SystemMessage, HumanMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
 import { ProjectState } from "./state";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { tools } from "./toolnode";
 import { Sandbox } from '@e2b/code-interpreter';
 import { sanitizeMessages } from "./utils";
 
-const llm = new ChatOpenAI({
-    model: "mistralai/mistral-large-3-675b-instruct-2512",
-    apiKey: process.env.NVIDIA_API_KEY,
-    configuration: {
-        baseURL: "https://integrate.api.nvidia.com/v1",
-    },
+const llm = new ChatGoogleGenerativeAI({
+    model: "gemini-2.5-flash",
+    apiKey: process.env.GOOGLE_API_KEY,
     temperature: 0,
-}).bindTools(tools, {
-    parallel_tool_calls: false,
-});
+}).bindTools(tools);
 
 export const reviewerNode = async (state: ProjectState, config: any) => {
     console.log("\n---  Reviewer Node Started ---");

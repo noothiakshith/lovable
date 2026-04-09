@@ -1,13 +1,10 @@
 import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 import { ProjectState } from "./state";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
-const llm = new ChatOpenAI({
-  model: "mistralai/mistral-large-3-675b-instruct-2512",
-  apiKey: process.env.NVIDIA_API_KEY,
-  configuration: {
-    baseURL: "https://integrate.api.nvidia.com/v1",
-  },
+const llm = new ChatGoogleGenerativeAI({
+  model: "gemini-2.5-flash",
+  apiKey: process.env.GOOGLE_API_KEY,
   temperature: 0,
   maxRetries: 2,
 });
